@@ -12,6 +12,7 @@ class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
+  Category _selectedCategory = Category.leisure;
 
   void _presentDate() async {
     final now = DateTime.now();
@@ -28,11 +29,24 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
+  void _submitExpenseData() { // send error message if data is not valid to user
+    final enteredAmount = double.tryParse(_amountController.text);
+    final amountIsValid = enteredAmount == null || enteredAmount <= 0;
+
+    if (_titleController.text.trim().isEmpty ||
+        amountIsValid ||
+        _selectedDate == null) {
+      {
+        return;
+      }
+    }
+  }
+
   @override
   void dispose() {
+    // delete controller cash from memory
     _titleController.dispose();
     _amountController.dispose();
-    // delete controller cash from memory
     super.dispose();
   }
 
@@ -81,8 +95,32 @@ class _NewExpenseState extends State<NewExpense> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 16,
+          ),
           Row(
             children: [
+              DropdownButton(
+                value: _selectedCategory,
+                items: Category.values
+                    .map(
+                      (category) => DropdownMenuItem(
+                          value: category,
+                          child: Text(
+                            category.name.toUpperCase(),
+                          )),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    if (value == null) {
+                      return;
+                    }
+                    _selectedCategory = value;
+                  });
+                },
+              ),
+              const Spacer(),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -90,10 +128,7 @@ class _NewExpenseState extends State<NewExpense> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                  onPressed: () {
-                    print(_titleController.text);
-                    print(_amountController.text);
-                  },
+                  onPressed: _submitExpenseData,
                   child: const Text('Save expense')),
             ],
           )
