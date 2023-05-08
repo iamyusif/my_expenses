@@ -29,7 +29,8 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
-  void _submitExpenseData() { // send error message if data is not valid to user
+  void _submitExpenseData() {
+    // send error message if data is not valid to user
     final enteredAmount = double.tryParse(_amountController.text);
     final amountIsValid = enteredAmount == null || enteredAmount <= 0;
 
@@ -37,6 +38,27 @@ class _NewExpenseState extends State<NewExpense> {
         amountIsValid ||
         _selectedDate == null) {
       {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text(
+              'Invalid input',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+            content: const Text(
+                'Please make sure a valid title,amount, date and category was entered.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                child: const Text('Okay'),
+              )
+            ],
+          ),
+        );
         return;
       }
     }
